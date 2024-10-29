@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 
 namespace ProgrammingLearningApp
 {
@@ -9,10 +8,11 @@ namespace ProgrammingLearningApp
         public string Name { get; set; }
         public List<Command> Commands { get; set; }
 
-        public Program(string name)
+        // Optional parameter to initialize with commands
+        public Program(string name, List<Command> commands = null)
         {
             Name = name;
-            Commands = new List<Command>();
+            Commands = commands ?? new List<Command>();
         }
 
         public void Execute(Character character)
@@ -39,6 +39,17 @@ namespace ProgrammingLearningApp
                 }
             }
             return maxLevel;
+        }
+
+        // New method to get execution trace
+        public List<string> GetExecutionTrace()
+        {
+            List<string> trace = new List<string>();
+            foreach (var command in Commands)
+            {
+                trace.Add(command.ToString());
+            }
+            return trace;
         }
     }
 }

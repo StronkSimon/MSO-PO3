@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ProgrammingLearningApp
 {
@@ -44,6 +41,22 @@ namespace ProgrammingLearningApp
                         }
                     }
                     break;
+            }
+        }
+
+        // New ToString method to provide command display in UI
+        public override string ToString()
+        {
+            switch (Type)
+            {
+                case CommandType.Move:
+                    return $"Move {Value} ";
+                case CommandType.Turn:
+                    return Value == 1 ? "Turn Right " : "Turn Left ";
+                case CommandType.Repeat:
+                    return $"Repeat {Value} times ";
+                default:
+                    return "Unknown Command";
             }
         }
     }
