@@ -61,7 +61,7 @@ namespace ProgrammingLearningApp
 
             // Command Buttons (Turn, Move, Repeat)
             Button turnButton = new Button { Text = "Turn", BackColor = Color.Blue, Width = 80 };
-            Button moveButton = new Button { Text = "Move", BackColor = Color.Red, Width = 80 };
+            Button moveButton = new Button { Text = "Move", BackColor = Color.Green, Width = 80 };
             Button repeatButton = new Button { Text = "Repeat", BackColor = Color.Yellow, Width = 80 };
             turnButton.Click += (s, e) => blockManager.CreateBlock(CommandType.Turn);
             moveButton.Click += (s, e) => blockManager.CreateBlock(CommandType.Move);
@@ -85,6 +85,7 @@ namespace ProgrammingLearningApp
             blockPanel = new FlowLayoutPanel
             {
                 FlowDirection = FlowDirection.TopDown,
+                WrapContents = false,
                 Dock = DockStyle.Fill,
                 AutoScroll = true,
                 BorderStyle = BorderStyle.FixedSingle
@@ -101,7 +102,7 @@ namespace ProgrammingLearningApp
             mainLayout.Controls.Add(gridPanel, 2, 1);
 
             // Run and Metrics Buttons
-            Button runButton = new Button { Text = "Run", BackColor = Color.Green, Width = 100 };
+            Button runButton = new Button { Text = "Run", BackColor = Color.Red, Width = 100 };
             Button metricsButton = new Button { Text = "Metrics", BackColor = Color.Blue, Width = 100 };
             runButton.Click += RunButton_Click;
             metricsButton.Click += MetricsButton_Click;
@@ -163,10 +164,21 @@ namespace ProgrammingLearningApp
             programController.LoadSampleProgram(level);
             blockPanel.Controls.Clear();
 
-            // Retrieve and display the list of commands in the block panel using BlockManager
             foreach (var command in programController.GetCommandDisplayList())
             {
-                //blockManager.CreateBlock(command.Type); // Create UI blocks for each loaded command
+                if (command.Type == CommandType.Repeat)
+                {
+                    blockManager.CreateBlock(command.Type, command.Id, command.Value);
+
+                    foreach (var subCommand in command.SubCommands)
+                    {
+                        blockManager.CreateBlock(subCommand.Type, subCommand.Id, subCommand.Value);
+                    }
+                }
+                else
+                {
+                    blockManager.CreateBlock(command.Type, command.Id, command.Value);
+                }
             }
         }
 
@@ -180,14 +192,14 @@ namespace ProgrammingLearningApp
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 string filePath = openFileDialog.FileName;
-                // Example: programController.LoadProgramFromFile(filePath);
+                // programController.LoadProgramFromFile(filePath);
 
                 blockPanel.Controls.Clear();
 
                 // Update the block panel to display the loaded program commands
                 foreach (var command in programController.GetCommandDisplayList())
                 {
-                    //blockManager.CreateBlock(command.Type); // Create UI blocks for each loaded command
+                    blockManager.CreateBlock(command.Type, command.Id, command.Value);
                 }
             }
         }

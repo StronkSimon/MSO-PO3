@@ -42,10 +42,9 @@ namespace ProgrammingLearningApp
             }
         }
 
-        // Returns a list of command descriptions for display
-        public List<string> GetCommandDisplayList()
+        public List<Command> GetCommandDisplayList()
         {
-            return programEditor.GetCommandDisplayList();
+            return program.Commands;
         }
 
         // Executes the program and returns the final state of the character
@@ -68,7 +67,7 @@ namespace ProgrammingLearningApp
         }
 
         // Adds a command to the program based on the type
-        public int AddCommand(CommandType type, int value)
+        public int AddCommand(CommandType type, int value, int? parentId = null)
         {
             Command newCommand = type switch
             {
@@ -78,8 +77,55 @@ namespace ProgrammingLearningApp
                 _ => throw new ArgumentException("Invalid command type")
             };
 
-            program.Commands.Add(newCommand);
+            if (parentId.HasValue)
+            {
+                // If parentId is provided, add the command as a subcommand to the specified Repeat command
+                Command parentCommand = program.Commands.Find(c => c.Id == parentId.Value && c.Type == CommandType.Repeat);
+                if (parentCommand != null)
+                {
+                    parentCommand.SubCommands.Add(newCommand);
+                }
+            }
+            else
+            {
+                // Add as a top-level command
+                program.Commands.Add(newCommand);
+            }
+
             return newCommand.Id; // Return the command's unique ID
+        }
+
+        public void DeleteCommand(int commandId)
+        {
+            Command commandToRemove = program.Commands.Find(c => c.Id == commandId);
+            if (commandToRemove != null)
+            {
+                program.Commands.Remove(commandToRemove);
+            }
+        }
+
+        public void AddSubCommand(int repeatCommandId, int subCommandId)
+        {
+            Command repeatCommand = program.Commands.Find(c => c.Id == repeatCommandId);
+            Command subCommand = program.Commands.Find(c => c.Id == subCommandId);
+
+            if (repeatCommand?.Type == CommandType.Repeat && subCommand != null)
+            {
+                repeatCommand.SubCommands.Add(subCommand);
+            }
+        }
+
+        public void DeleteSubCommand(int parentId, int subCommandId)
+        {
+            Command parentCommand = program.Commands.Find(c => c.Id == parentId && c.Type == CommandType.Repeat);
+            if (parentCommand != null)
+            {
+                Command subCommandToRemove = parentCommand.SubCommands.Find(c => c.Id == subCommandId);
+                if (subCommandToRemove != null)
+                {
+                    parentCommand.SubCommands.Remove(subCommandToRemove);
+                }
+            }
         }
 
         public void UpdateCommandValue(int commandId, int newValue)
