@@ -7,16 +7,20 @@ namespace ProgrammingLearningApp
 
     public class Command
     {
+        private static int idCounter = 0;
+        public int Id { get; private set; }
         public CommandType Type { get; set; }
         public int Value { get; set; }
         public Character Character { get; set; }
-        public List<Command> SubCommands { get; set; } = new List<Command>();
+        public List<Command> SubCommands { get; set; }
 
         public Command(CommandType type, int value, Character character)
         {
+            Id = idCounter++;
             Type = type;
             Value = value;
             Character = character;
+            SubCommands = new List<Command>();
         }
 
         public void Execute(Character character)

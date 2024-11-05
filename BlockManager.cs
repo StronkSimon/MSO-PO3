@@ -42,18 +42,30 @@ namespace ProgrammingLearningApp
                 Dock = DockStyle.Right
             };
 
+            // Add the command to the program and get its ID
+            int commandId = programController.AddCommand(type, int.Parse(inputField.Text));
+            inputField.Tag = commandId;
+
+            inputField.TextChanged += (sender, args) =>
+            {
+                if (sender is TextBox textBox && int.TryParse(textBox.Text, out int newValue))
+                {
+                    int id = (int)textBox.Tag;
+                    programController.UpdateCommandValue(id, newValue);
+                }
+                else
+                {
+                    //TODO
+                }
+            };
+
             block.Controls.Add(commandLabel);
             block.Controls.Add(inputField);
             block.MouseDown += Block_MouseDown;
             block.DragEnter += Block_DragEnter;
             block.DragDrop += Block_DragDrop;
 
-            // Add the block to the block panel
             blockPanel.Controls.Add(block);
-
-            // Add command to program based on block input
-            int value = int.TryParse(inputField.Text, out int parsedValue) ? parsedValue : 1; // Default to 1 if parsing fails
-            programController.AddCommand(type, value);
         }
 
         private Color GetBlockColor(CommandType type)

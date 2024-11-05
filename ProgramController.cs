@@ -68,7 +68,7 @@ namespace ProgrammingLearningApp
         }
 
         // Adds a command to the program based on the type
-        public void AddCommand(CommandType type, int value)
+        public int AddCommand(CommandType type, int value)
         {
             Command newCommand = type switch
             {
@@ -79,6 +79,17 @@ namespace ProgrammingLearningApp
             };
 
             program.Commands.Add(newCommand);
+            return newCommand.Id; // Return the command's unique ID
+        }
+
+        public void UpdateCommandValue(int commandId, int newValue)
+        {
+            // Find the command with the specified ID and update its value
+            var command = program.Commands.Find(c => c.Id == commandId);
+            if (command != null)
+            {
+                command.Value = newValue;
+            }
         }
     }
 }
