@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace ProgrammingLearningApp
 {
@@ -61,24 +62,23 @@ namespace ProgrammingLearningApp
             return new Dictionary<string, int>
             {
                 { "Total Commands", program.GetCommandCount() },
-                { "   Max Nesting Level", program.GetMaxNestingLevel() },
-                { "   Repeat Commands", program.GetRepeatCommandCount() }
+                { "Max Nesting Level", program.GetMaxNestingLevel() },
+                { "Repeat Commands", program.GetRepeatCommandCount() }
             };
         }
 
         // Adds a command to the program based on the type
         public void AddCommand(CommandType type, int value)
         {
-            if (type == CommandType.Repeat)
+            Command newCommand = type switch
             {
-                var repeatCommand = new Command(type, value, character);
-                repeatCommand.SubCommands.Add(new Command(CommandType.Move, 1, character)); // Sample subcommand
-                programEditor.AddCommand(repeatCommand);
-            }
-            else
-            {
-                programEditor.AddCommand(new Command(type, value, character));
-            }
+                CommandType.Move => new Command(CommandType.Move, value, character),
+                CommandType.Turn => new Command(CommandType.Turn, value, character),
+                CommandType.Repeat => new Command(CommandType.Repeat, value, character),
+                _ => throw new ArgumentException("Invalid command type")
+            };
+
+            program.Commands.Add(newCommand);
         }
     }
 }

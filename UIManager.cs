@@ -1,25 +1,30 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
-using System.Collections.Generic;
 
 namespace ProgrammingLearningApp
 {
     public partial class UIManager : Form
     {
-        private ProgramController programController;
-        private TextBox commandDisplay;
-        private TextBox outputDisplay;
+        private readonly ProgramController programController;
+        private readonly BlockManager blockManager;
+        private FlowLayoutPanel blockPanel;
+        private Panel gridPanel;
 
         public UIManager()
         {
             InitializeComponent();
             programController = new ProgramController();
+
+            // Initialize BlockManager with blockPanel and programController
+            blockManager = new BlockManager(blockPanel, programController);
         }
 
         private void InitializeComponent()
         {
-            // Set up main form
+            // Set up the main form
             this.Text = "Learn To Program!";
             this.Width = 800;
             this.Height = 600;
@@ -55,12 +60,12 @@ namespace ProgrammingLearningApp
             loadProgramComboBox.SelectedIndex = -1; // No item selected initially
 
             // Command Buttons (Turn, Move, Repeat)
-            Button turnButton = new Button { Text = "Turn", BackColor = System.Drawing.Color.Orange, Width = 80 };
-            Button moveButton = new Button { Text = "Move", BackColor = System.Drawing.Color.Orange, Width = 80 };
-            Button repeatButton = new Button { Text = "Repeat", BackColor = System.Drawing.Color.Orange, Width = 80 };
-            turnButton.Click += (s, e) => AddCommand(CommandType.Turn, 1);
-            moveButton.Click += (s, e) => AddCommand(CommandType.Move, 3);
-            repeatButton.Click += (s, e) => AddCommand(CommandType.Repeat, 2);
+            Button turnButton = new Button { Text = "Turn", BackColor = Color.Blue, Width = 80 };
+            Button moveButton = new Button { Text = "Move", BackColor = Color.Red, Width = 80 };
+            Button repeatButton = new Button { Text = "Repeat", BackColor = Color.Yellow, Width = 80 };
+            turnButton.Click += (s, e) => blockManager.CreateBlock(CommandType.Turn);
+            moveButton.Click += (s, e) => blockManager.CreateBlock(CommandType.Move);
+            repeatButton.Click += (s, e) => blockManager.CreateBlock(CommandType.Repeat);
 
             // Top button panel
             FlowLayoutPanel topButtonPanel = new FlowLayoutPanel
@@ -76,28 +81,28 @@ namespace ProgrammingLearningApp
             mainLayout.Controls.Add(topButtonPanel, 0, 0);
             mainLayout.SetColumnSpan(topButtonPanel, 3); // Span across all columns
 
-            // Command Display (for list of commands)
-            commandDisplay = new TextBox
+            // Block-based Command Panel (to list the blocks)
+            blockPanel = new FlowLayoutPanel
             {
-                Multiline = true,
+                FlowDirection = FlowDirection.TopDown,
                 Dock = DockStyle.Fill,
-                ReadOnly = true,
-                ScrollBars = ScrollBars.Vertical
+                AutoScroll = true,
+                BorderStyle = BorderStyle.FixedSingle
             };
-            mainLayout.Controls.Add(commandDisplay, 0, 1);
+            mainLayout.Controls.Add(blockPanel, 0, 1);
 
             // Visualization Panel (Grid for character movement)
-            Panel gridPanel = new Panel
+            gridPanel = new Panel
             {
                 Dock = DockStyle.Fill,
-                BackColor = System.Drawing.Color.White,
+                BackColor = Color.White,
                 BorderStyle = BorderStyle.FixedSingle
             };
             mainLayout.Controls.Add(gridPanel, 2, 1);
 
             // Run and Metrics Buttons
-            Button runButton = new Button { Text = "Run", BackColor = System.Drawing.Color.Green, Width = 100 };
-            Button metricsButton = new Button { Text = "Metrics", BackColor = System.Drawing.Color.Blue, Width = 100 };
+            Button runButton = new Button { Text = "Run", BackColor = Color.Green, Width = 100 };
+            Button metricsButton = new Button { Text = "Metrics", BackColor = Color.Blue, Width = 100 };
             runButton.Click += RunButton_Click;
             metricsButton.Click += MetricsButton_Click;
 
@@ -112,77 +117,12 @@ namespace ProgrammingLearningApp
             actionButtonPanel.Controls.Add(metricsButton);
             mainLayout.Controls.Add(actionButtonPanel, 0, 2);
             mainLayout.SetColumnSpan(actionButtonPanel, 3); // Span across all columns
-
-            // Output Display
-            outputDisplay = new TextBox
-            {
-                Multiline = true,
-                Dock = DockStyle.Fill,
-                ReadOnly = true,
-                ScrollBars = ScrollBars.Vertical
-            };
-            mainLayout.Controls.Add(outputDisplay, 0, 3);
-            mainLayout.SetColumnSpan(outputDisplay, 3); // Span across all columns
-        }
-
-        private void LoadButton_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*";
-
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                string filePath = openFileDialog.FileName;
-                // Code to load from file can go here
-            }
-        }
-
-        private void LoadSampleProgram(string level)
-        {
-            programController.LoadSampleProgram(level);
-            UpdateCommandDisplay();
-        }
-
-        private void UpdateCommandDisplay()
-        {
-            commandDisplay.Clear();
-            foreach (var commandText in programController.GetCommandDisplayList())
-            {
-                commandDisplay.AppendText(commandText + "\n");
-            }
-        }
-
-        private void RunButton_Click(object sender, EventArgs e)
-        {
-            string result = programController.RunProgram();
-            outputDisplay.Clear();
-            outputDisplay.AppendText(result);
-        }
-
-        private void MetricsButton_Click(object sender, EventArgs e)
-        {
-            outputDisplay.Clear();
-            var metrics = programController.GetMetrics();
-            outputDisplay.AppendText("Program Metrics: \n");
-            foreach (var metric in metrics)
-            {
-                outputDisplay.AppendText($"{metric.Key}: {metric.Value}\n");
-            }
-        }
-
-        private void AddCommand(CommandType type, int value)
-        {
-            programController.AddCommand(type, value);
-            UpdateCommandDisplay();
         }
 
         private void LoadProgramComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ComboBox comboBox = sender as ComboBox;
-            if (comboBox.SelectedItem != null)
+            if (sender is ComboBox comboBox && comboBox.SelectedItem is string selectedOption)
             {
-                string selectedOption = comboBox.SelectedItem.ToString();
-
                 switch (selectedOption)
                 {
                     case "Basic":
@@ -201,17 +141,54 @@ namespace ProgrammingLearningApp
             }
         }
 
+        private void RunButton_Click(object sender, EventArgs e)
+        {
+            string result = programController.RunProgram();
+            MessageBox.Show(result, "Execution Result");
+        }
+
+        private void MetricsButton_Click(object sender, EventArgs e)
+        {
+            var metrics = programController.GetMetrics();
+            string metricsDisplay = "Program Metrics: \n";
+            foreach (var metric in metrics)
+            {
+                metricsDisplay += $"{metric.Key}: {metric.Value}\n";
+            }
+            MessageBox.Show(metricsDisplay, "Metrics");
+        }
+
+        private void LoadSampleProgram(string level)
+        {
+            programController.LoadSampleProgram(level);
+            blockPanel.Controls.Clear();
+
+            // Retrieve and display the list of commands in the block panel using BlockManager
+            foreach (var command in programController.GetCommandDisplayList())
+            {
+                //blockManager.CreateBlock(command.Type); // Create UI blocks for each loaded command
+            }
+        }
+
         private void LoadProgramFromFile()
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*";
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*"
+            };
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 string filePath = openFileDialog.FileName;
-                // Load the program from the selected file (implementation will vary)
                 // Example: programController.LoadProgramFromFile(filePath);
-                UpdateCommandDisplay();
+
+                blockPanel.Controls.Clear();
+
+                // Update the block panel to display the loaded program commands
+                foreach (var command in programController.GetCommandDisplayList())
+                {
+                    //blockManager.CreateBlock(command.Type); // Create UI blocks for each loaded command
+                }
             }
         }
     }
