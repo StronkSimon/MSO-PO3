@@ -1,3 +1,5 @@
+﻿using System.Collections.Generic;
+using System.Windows.Forms;
 ﻿using System;
 using System.Collections.Generic;
 
@@ -5,6 +7,9 @@ namespace ProgrammingLearningApp
 {
     public class ProgramController
     {
+        private Character character;
+        private ProgramEditor programEditor;
+        private ExportManager exportManager;
         private readonly Program program;
         private readonly Character character;
         private readonly Grid grid;
@@ -14,6 +19,8 @@ namespace ProgrammingLearningApp
             grid = new Grid(10, 10); // Initialize a 10x10 grid
             character = new Character(grid); // Pass the grid to the character
             program = new Program("Sample Program");
+            programEditor = new ProgramEditor(program);
+            exportManager = new ExportManager();
         }
 
         public Character Character => character; // Expose character to UIManager
@@ -63,6 +70,19 @@ namespace ProgrammingLearningApp
             character.Reset(); // Reset character position and direction without reassigning
             program.Execute(character);
             return $"Final Position: ({character.X}, {character.Y}), Facing: {character.Direction}";
+        }
+
+        public void SaveProgram()
+        {
+            if (program.Commands.Count == 0)
+            {
+                MessageBox.Show("No Program Loaded", "Error",
+                MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
+            {
+                exportManager.SaveProgram(program);
+            }
         }
 
         // Retrieves program metrics for display

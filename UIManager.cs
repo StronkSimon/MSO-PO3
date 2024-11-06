@@ -59,9 +59,11 @@ namespace ProgrammingLearningApp
             loadProgramComboBox.SelectedIndex = -1; // No item selected initially
 
             // Command Buttons (Turn, Move, Repeat)
-            Button turnButton = new Button { Text = "Turn", BackColor = Color.Blue, Width = 80 };
-            Button moveButton = new Button { Text = "Move", BackColor = Color.Green, Width = 80 };
-            Button repeatButton = new Button { Text = "Repeat", BackColor = Color.Yellow, Width = 80 };
+            Button turnButton = new Button { Text = "Turn", BackColor = System.Drawing.Color.Orange, Width = 80 };
+            Button moveButton = new Button { Text = "Move", BackColor = System.Drawing.Color.Orange, Width = 80 };
+            Button repeatButton = new Button { Text = "Repeat", BackColor = System.Drawing.Color.Orange, Width = 80 };
+            Button saveButton = new Button { Text = "Save", BackColor = System.Drawing.Color.Orange, Width = 80 };
+            saveButton.Click += (s, e) => SaveProgram();
             turnButton.Click += (s, e) => blockManager.CreateBlock(CommandType.Turn);
             moveButton.Click += (s, e) => blockManager.CreateBlock(CommandType.Move);
             repeatButton.Click += (s, e) => blockManager.CreateBlock(CommandType.Repeat);
@@ -77,6 +79,7 @@ namespace ProgrammingLearningApp
             topButtonPanel.Controls.Add(turnButton);
             topButtonPanel.Controls.Add(moveButton);
             topButtonPanel.Controls.Add(repeatButton);
+            topButtonPanel.Controls.Add(saveButton);
             mainLayout.Controls.Add(topButtonPanel, 0, 0);
             mainLayout.SetColumnSpan(topButtonPanel, 2); // Span across all columns
 
@@ -174,6 +177,12 @@ namespace ProgrammingLearningApp
         {
             programController.LoadSampleProgram(level);
             blockPanel.Controls.Clear();
+        }
+        private void SaveProgram()
+        {
+            programController.SaveProgram();
+            UpdateCommandDisplay();
+        }           
 
             foreach (var command in programController.GetCommandDisplayList())
             {
