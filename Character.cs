@@ -22,13 +22,13 @@ namespace ProgrammingLearningApp
             switch (Direction)
             {
                 case Direction.North:
-                    newY += steps;
+                    newY -= steps;
                     break;
                 case Direction.East:
                     newX += steps;
                     break;
                 case Direction.South:
-                    newY -= steps;
+                    newY += steps;
                     break;
                 case Direction.West:
                     newX -= steps;
