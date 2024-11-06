@@ -27,8 +27,19 @@ namespace ProgrammingLearningApp
                 AllowDrop = true,
                 BackColor = GetBlockColor(type),
                 BorderStyle = BorderStyle.FixedSingle,
-                Tag = commandId // Store the command ID in the Tag
+                Tag = new BlockInfo { CommandId = commandId, Type = type } // Store CommandType and CommandId in Tag
             };
+
+            // Create a designated drag handle
+            Panel dragHandle = new Panel
+            {
+                Width = block.Width,
+                Height = 15,
+                Dock = DockStyle.Top,
+                BackColor = Color.Gray,
+                Cursor = Cursors.Hand // Indicates draggable area
+            };
+            dragHandle.MouseDown += DragHandle_MouseDown;
 
             Button deleteButton = new Button
             {
@@ -79,6 +90,7 @@ namespace ProgrammingLearningApp
 
             block.Controls.Add(commandLabel);
             block.Controls.Add(inputField);
+            block.Controls.Add(dragHandle);
 
             if (type == CommandType.Repeat)
             {
@@ -91,17 +103,17 @@ namespace ProgrammingLearningApp
                     WrapContents = false,
                     Dock = DockStyle.Fill,
                     Tag = commandId,
-                    Padding = new Padding(0, 25, 0, 0)
+                    Padding = new Padding(0, 40, 0, 0)
                 };
 
                 // Adjust Repeat block height based on subcommand count
-                subCommandPanel.ControlAdded += (sender, args) => AdjustRepeatBlockHeight(block, subCommandPanel);
-                subCommandPanel.ControlRemoved += (sender, args) => AdjustRepeatBlockHeight(block, subCommandPanel);
+                subCommandPanel.ControlAdded += (sender, args) => AdjustRepeatBlock(block, subCommandPanel);
+                subCommandPanel.ControlRemoved += (sender, args) => AdjustRepeatBlock(block, subCommandPanel);
 
                 subCommandPanel.DragEnter += Block_DragEnter;
                 subCommandPanel.DragDrop += (s, e) => SubCommandPanel_DragDrop(s, e, commandId); // Pass parent ID
 
-                block.Controls.Add(subCommandPanel);
+                block.Controls.Add(subCommandPanel);              
             }
 
             // Event handler for TextBox to update the command value in ProgramController
@@ -135,6 +147,14 @@ namespace ProgrammingLearningApp
             };
         }
 
+        private void DragHandle_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (sender is Panel handle && handle.Parent is Panel block)
+            {
+                block.DoDragDrop(block, DragDropEffects.Move);
+            }
+        }
+
         private void Block_MouseDown(object sender, MouseEventArgs e)
         {
             if (sender is Panel block)
@@ -164,21 +184,52 @@ namespace ProgrammingLearningApp
         {
             if (e.Data.GetData(typeof(Panel)) is Panel draggedBlock && sender is FlowLayoutPanel subCommandPanel)
             {
-                int subCommandId = (int)draggedBlock.Tag;
+                // Retrieve the command type from the Tag property of the dragged block
+                var blockInfo = (BlockInfo)draggedBlock.Tag;
 
-                subCommandPanel.Controls.Add(draggedBlock); // Add the block to the UI
+                // Add the block to the UI and to the ProgramController as a nested command
+                subCommandPanel.Controls.Add(draggedBlock);
+                programController.AddSubCommand(parentId, blockInfo.CommandId);
 
-                // Add to ProgramController as a nested command
-                programController.AddSubCommand(parentId, subCommandId);
+                // Check if the dragged block is of type Repeat and adjust dimensions if so
+                if (blockInfo.Type == CommandType.Repeat)
+                {
+                    AdjustRepeatBlock((Panel)subCommandPanel.Parent, subCommandPanel);
+                }
             }
         }
 
-        // Helper method to adjust the height of the Repeat block based on subcommands
-        private void AdjustRepeatBlockHeight(Panel repeatBlock, FlowLayoutPanel subCommandPanel)
+        private void AdjustRepeatBlock(Panel repeatBlock, FlowLayoutPanel subCommandPanel)
         {
-            int baseHeight = 60; // Base height for label, input, and padding
-            int subCommandsHeight = subCommandPanel.Controls.Count * 60;
-            repeatBlock.Height = baseHeight + subCommandsHeight;
+            int baseWidth = 170;
+            int baseHeight = 90;
+
+            int maxWidth = baseWidth;
+            int subCommandsHeight = 0;
+
+            int Padding = 20;
+
+            foreach (Control control in subCommandPanel.Controls)
+            {
+                subCommandsHeight += control.Height;
+
+                if (control is Panel subBlock && subBlock.Width > maxWidth)
+                {
+                    maxWidth = subBlock.Width;
+                }
+            }
+
+            repeatBlock.Width = maxWidth + Padding; // Adjust width with padding
+            repeatBlock.Height = baseHeight + subCommandsHeight; // Adjust height based on subcommands
+
+            // Recursive call for resizing the parent if it's also a Repeat block
+            if (repeatBlock.Parent is FlowLayoutPanel parentPanel &&
+                parentPanel.Parent is Panel parentBlock &&
+                parentBlock.Tag is BlockInfo parentBlockInfo &&
+                parentBlockInfo.Type == CommandType.Repeat)
+            {
+                AdjustRepeatBlock(parentBlock, parentPanel);
+            }
         }
     }
 }

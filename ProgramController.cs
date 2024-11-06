@@ -7,13 +7,11 @@ namespace ProgrammingLearningApp
     {
         private Program program;
         private Character character;
-        private ProgramEditor programEditor;
 
         public ProgramController()
         {
             character = new Character();
             program = new Program("Sample Program");
-            programEditor = new ProgramEditor(program);
         }
 
         // Loads a hardcoded sample program based on difficulty level
@@ -23,22 +21,30 @@ namespace ProgrammingLearningApp
 
             if (level == "Basic")
             {
-                programEditor.AddCommand(new Command(CommandType.Move, 5, character));
-                programEditor.AddCommand(new Command(CommandType.Turn, 1, character));
+                AddCommand(CommandType.Move, 5);
+                AddCommand(CommandType.Turn, 1);
             }
             else if (level == "Advanced")
             {
-                var repeatCommand = new Command(CommandType.Repeat, 3, character);
-                repeatCommand.SubCommands.Add(new Command(CommandType.Move, 2, character));
-                repeatCommand.SubCommands.Add(new Command(CommandType.Turn, 1, character));
-                programEditor.AddCommand(repeatCommand);
+                int repeatCommandId = AddCommand(CommandType.Repeat, 3);
+                Command repeatCommand = program.Commands.Find(c => c.Id == repeatCommandId);
+                if (repeatCommand != null && repeatCommand.Type == CommandType.Repeat)
+                {
+                    repeatCommand.SubCommands.Add(new Command(CommandType.Move, 2, character));
+                    repeatCommand.SubCommands.Add(new Command(CommandType.Turn, 1, character));
+                }
             }
             else if (level == "Expert")
             {
-                var expertRepeat = new Command(CommandType.Repeat, 5, character);
-                expertRepeat.SubCommands.Add(new Command(CommandType.Move, 2, character));
-                programEditor.AddCommand(expertRepeat);
-                programEditor.AddCommand(new Command(CommandType.Turn, -1, character));
+                int expertRepeatCommandId = AddCommand(CommandType.Repeat, 5);
+
+                Command expertRepeatCommand = program.Commands.Find(c => c.Id == expertRepeatCommandId);
+                if (expertRepeatCommand != null && expertRepeatCommand.Type == CommandType.Repeat)
+                {
+                    expertRepeatCommand.SubCommands.Add(new Command(CommandType.Move, 2, character));
+                }
+
+                AddCommand(CommandType.Turn, -1);
             }
         }
 
@@ -79,20 +85,15 @@ namespace ProgrammingLearningApp
 
             if (parentId.HasValue)
             {
-                // If parentId is provided, add the command as a subcommand to the specified Repeat command
                 Command parentCommand = program.Commands.Find(c => c.Id == parentId.Value && c.Type == CommandType.Repeat);
-                if (parentCommand != null)
-                {
-                    parentCommand.SubCommands.Add(newCommand);
-                }
+                parentCommand?.SubCommands.Add(newCommand);
             }
             else
             {
-                // Add as a top-level command
                 program.Commands.Add(newCommand);
             }
 
-            return newCommand.Id; // Return the command's unique ID
+            return newCommand.Id;
         }
 
         public void DeleteCommand(int commandId)
