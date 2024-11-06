@@ -12,33 +12,32 @@ namespace ProgrammingLearningApp
         private readonly BlockManager blockManager;
         private FlowLayoutPanel blockPanel;
         private Panel gridPanel;
+        private Grid grid;
 
         public UIManager()
         {
             InitializeComponent();
             programController = new ProgramController();
-
-            // Initialize BlockManager with blockPanel and programController
             blockManager = new BlockManager(blockPanel, programController);
+            grid = new Grid(10, 10);
         }
 
         private void InitializeComponent()
         {
             // Set up the main form
             this.Text = "Learn To Program!";
-            this.Width = 800;
-            this.Height = 600;
+            this.Width = 1034;
+            this.Height = 867;
 
             // Create main layout table
             TableLayoutPanel mainLayout = new TableLayoutPanel
             {
                 Dock = DockStyle.Fill,
-                ColumnCount = 3,
+                ColumnCount = 2,
                 RowCount = 4
             };
-            mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30F)); // Left column for command display
-            mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40F)); // Center column for buttons
-            mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30F)); // Right column for grid panel
+            mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F)); // Left column for command display
+            mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F)); // Right column for grid panel
             mainLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 50F)); // Top row for load and command buttons
             mainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 70F)); // Middle row for command display and grid
             mainLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 50F)); // Run and Metrics buttons row
@@ -79,7 +78,7 @@ namespace ProgrammingLearningApp
             topButtonPanel.Controls.Add(moveButton);
             topButtonPanel.Controls.Add(repeatButton);
             mainLayout.Controls.Add(topButtonPanel, 0, 0);
-            mainLayout.SetColumnSpan(topButtonPanel, 3); // Span across all columns
+            mainLayout.SetColumnSpan(topButtonPanel, 2); // Span across all columns
 
             // Block-based Command Panel (to list the blocks)
             blockPanel = new FlowLayoutPanel
@@ -99,6 +98,7 @@ namespace ProgrammingLearningApp
                 BackColor = Color.White,
                 BorderStyle = BorderStyle.FixedSingle
             };
+            gridPanel.Paint += GridPanel_Paint;
             mainLayout.Controls.Add(gridPanel, 2, 1);
 
             // Run and Metrics Buttons
@@ -142,9 +142,20 @@ namespace ProgrammingLearningApp
             }
         }
 
+        private void GridPanel_Paint(object sender, PaintEventArgs e)
+        {
+            // Get the latest character position
+            int characterX = programController.Character.X;
+            int characterY = programController.Character.Y;
+
+            // Draw the grid and character position using the Grid class
+            grid.Draw(e.Graphics, gridPanel.Width, gridPanel.Height, characterX, characterY);
+        }
+
         private void RunButton_Click(object sender, EventArgs e)
         {
             string result = programController.RunProgram();
+            gridPanel.Invalidate();
             MessageBox.Show(result, "Execution Result");
         }
 
