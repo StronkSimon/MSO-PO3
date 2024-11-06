@@ -7,16 +7,20 @@ namespace ProgrammingLearningApp
 
     public class Command
     {
+        private static int idCounter = 0;
+        public int Id { get; private set; }
         public CommandType Type { get; set; }
-        public int Value { get; set; } // Used for Move steps or Repeat times
+        public int Value { get; set; }
         public Character Character { get; set; }
-        public List<Command> SubCommands { get; set; } = new List<Command>();
+        public List<Command> SubCommands { get; set; }
 
         public Command(CommandType type, int value, Character character)
         {
+            Id = idCounter++;
             Type = type;
             Value = value;
             Character = character;
+            SubCommands = new List<Command>();
         }
 
         public void Execute(Character character)
@@ -41,22 +45,6 @@ namespace ProgrammingLearningApp
                         }
                     }
                     break;
-            }
-        }
-
-        // New ToString method to provide command display in UI
-        public override string ToString()
-        {
-            switch (Type)
-            {
-                case CommandType.Move:
-                    return $"Move {Value} ";
-                case CommandType.Turn:
-                    return Value == 1 ? "Turn Right " : "Turn Left ";
-                case CommandType.Repeat:
-                    return $"Repeat {Value} times ";
-                default:
-                    return "Unknown Command";
             }
         }
     }
