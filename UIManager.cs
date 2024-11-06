@@ -58,9 +58,11 @@ namespace ProgrammingLearningApp
             Button turnButton = new Button { Text = "Turn", BackColor = System.Drawing.Color.Orange, Width = 80 };
             Button moveButton = new Button { Text = "Move", BackColor = System.Drawing.Color.Orange, Width = 80 };
             Button repeatButton = new Button { Text = "Repeat", BackColor = System.Drawing.Color.Orange, Width = 80 };
+            Button saveButton = new Button { Text = "Save", BackColor = System.Drawing.Color.Orange, Width = 80 };
             turnButton.Click += (s, e) => AddCommand(CommandType.Turn, 1);
             moveButton.Click += (s, e) => AddCommand(CommandType.Move, 3);
             repeatButton.Click += (s, e) => AddCommand(CommandType.Repeat, 2);
+            saveButton.Click += (s, e) => SaveProgram();
 
             // Top button panel
             FlowLayoutPanel topButtonPanel = new FlowLayoutPanel
@@ -73,6 +75,7 @@ namespace ProgrammingLearningApp
             topButtonPanel.Controls.Add(turnButton);
             topButtonPanel.Controls.Add(moveButton);
             topButtonPanel.Controls.Add(repeatButton);
+            topButtonPanel.Controls.Add(saveButton);
             mainLayout.Controls.Add(topButtonPanel, 0, 0);
             mainLayout.SetColumnSpan(topButtonPanel, 3); // Span across all columns
 
@@ -173,6 +176,11 @@ namespace ProgrammingLearningApp
         private void AddCommand(CommandType type, int value)
         {
             programController.AddCommand(type, value);
+            UpdateCommandDisplay();
+        }
+        private void SaveProgram()
+        {
+            programController.SaveProgram();
             UpdateCommandDisplay();
         }
 

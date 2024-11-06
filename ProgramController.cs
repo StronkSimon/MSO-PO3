@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace ProgrammingLearningApp
 {
@@ -7,12 +8,14 @@ namespace ProgrammingLearningApp
         private Program program;
         private Character character;
         private ProgramEditor programEditor;
+        private ExportManager exportManager;
 
         public ProgramController()
         {
             character = new Character();
             program = new Program("Sample Program");
             programEditor = new ProgramEditor(program);
+            exportManager = new ExportManager();
         }
 
         // Loads a hardcoded sample program based on difficulty level
@@ -53,6 +56,19 @@ namespace ProgrammingLearningApp
             character = new Character(); // Reset character position and direction
             program.Execute(character);
             return $"Final Position: ({character.X}, {character.Y}), Facing: {character.Direction}";
+        }
+
+        public void SaveProgram()
+        {
+            if (program.Commands.Count == 0)
+            {
+                MessageBox.Show("No Program Loaded", "Error",
+                MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
+            {
+                exportManager.SaveProgram(program);
+            }
         }
 
         // Retrieves program metrics for display
