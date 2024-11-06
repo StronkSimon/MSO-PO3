@@ -7,8 +7,6 @@ namespace ProgrammingLearningApp
 {
     public class ProgramController
     {
-        private Character character;
-        private ProgramEditor programEditor;
         private ExportManager exportManager;
         private readonly Program program;
         private readonly Character character;
@@ -19,7 +17,6 @@ namespace ProgrammingLearningApp
             grid = new Grid(10, 10); // Initialize a 10x10 grid
             character = new Character(grid); // Pass the grid to the character
             program = new Program("Sample Program");
-            programEditor = new ProgramEditor(program);
             exportManager = new ExportManager();
         }
 

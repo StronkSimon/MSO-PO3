@@ -172,17 +172,15 @@ namespace ProgrammingLearningApp
             }
             MessageBox.Show(metricsDisplay, "Metrics");
         }
-
+        private void SaveProgram()
+        {
+            programController.SaveProgram();
+        }        
+       
         private void LoadSampleProgram(string level)
         {
             programController.LoadSampleProgram(level);
             blockPanel.Controls.Clear();
-        }
-        private void SaveProgram()
-        {
-            programController.SaveProgram();
-            UpdateCommandDisplay();
-        }           
 
             foreach (var command in programController.GetCommandDisplayList())
             {
