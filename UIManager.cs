@@ -47,7 +47,7 @@ namespace ProgrammingLearningApp
             // Load Program Dropdown using ComboBox
             ComboBox loadProgramComboBox = new ComboBox
             {
-                Text = "Load",
+                Text = "Load Program",
                 Width = 100,
                 DropDownStyle = ComboBoxStyle.DropDownList // Prevents text entry
             };
@@ -55,8 +55,21 @@ namespace ProgrammingLearningApp
             loadProgramComboBox.Items.Add("Advanced");
             loadProgramComboBox.Items.Add("Expert");
             loadProgramComboBox.Items.Add("From file...");
+            loadProgramComboBox.Items.Add("Clear");
             loadProgramComboBox.SelectedIndexChanged += LoadProgramComboBox_SelectedIndexChanged;
             loadProgramComboBox.SelectedIndex = -1; // No item selected initially
+
+            // Load Exercise Dropdown using CombobBox
+            ComboBox loadExerciseComboBox = new ComboBox
+            {
+                Text = "Load Exercise",
+                Width = 100,
+                DropDownStyle = ComboBoxStyle.DropDownList // Prevents text entry
+            };
+            loadExerciseComboBox.Items.Add("Pathfinding");
+            loadExerciseComboBox.Items.Add("Clear");
+            loadExerciseComboBox.SelectedIndexChanged += LoadExerciseComboBox_SelectedIndexChanged;
+            loadExerciseComboBox.SelectedIndex = -1;
 
             // Command Buttons (Turn, Move, Repeat)
             Button turnButton = new Button { Text = "Turn", BackColor = System.Drawing.Color.Orange, Width = 80 };
@@ -76,6 +89,7 @@ namespace ProgrammingLearningApp
                 AutoSize = true
             };
             topButtonPanel.Controls.Add(loadProgramComboBox);
+            topButtonPanel.Controls.Add(loadExerciseComboBox);
             topButtonPanel.Controls.Add(turnButton);
             topButtonPanel.Controls.Add(moveButton);
             topButtonPanel.Controls.Add(repeatButton);
@@ -140,6 +154,23 @@ namespace ProgrammingLearningApp
                         break;
                     case "From file...":
                         LoadProgramFromFile();
+                        break;
+                    case "Clear":
+                        break;
+                }
+            }
+        }
+
+        private void LoadExerciseComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (sender is ComboBox comboBox && comboBox.SelectedItem is string selectedOption)
+            {
+                switch (selectedOption)
+                {
+                    case "Pathfinding":
+                        LoadExerciseFromFile();
+                        break;
+                    case "Clear":
                         break;
                 }
             }
