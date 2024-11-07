@@ -171,6 +171,7 @@ namespace ProgrammingLearningApp
                         LoadExerciseFromFile();
                         break;
                     case "Clear":
+                        ClearExercise();
                         break;
                 }
             }
@@ -268,6 +269,12 @@ namespace ProgrammingLearningApp
                 grid.InitializeExercise(pathFindingExercise.exerciseCharList);
                 gridPanel.Invalidate();
             }
+        }
+
+        private void ClearExercise()
+        {
+            grid.ClearExercise();
+            gridPanel.Invalidate();
         }
     }
 }
