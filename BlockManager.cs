@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Windows.Forms;
 
 namespace ProgrammingLearningApp
@@ -16,7 +14,7 @@ namespace ProgrammingLearningApp
             this.programController = programController;
         }
 
-        public void CreateBlock(CommandType type, int? id = null, int initialValue = 1, int? parentId = null)
+        public Panel CreateBlock(CommandType type, int? id = null, int initialValue = 1, int? parentId = null)
         {
             // If `id` is null, add a new command and get its ID; otherwise, use the provided ID
             int commandId = id ?? programController.AddCommand(type, initialValue, parentId);
@@ -89,13 +87,14 @@ namespace ProgrammingLearningApp
                 Dock = DockStyle.Right
             };
 
+            // Add controls to the block
             block.Controls.Add(commandLabel);
             block.Controls.Add(inputField);
             block.Controls.Add(dragHandle);
 
+            // If the command is of type Repeat, add a subcommand panel for nested commands
             if (type == CommandType.Repeat)
             {
-                // Subcommand panel for vertical stacking of subcommands
                 FlowLayoutPanel subCommandPanel = new FlowLayoutPanel
                 {
                     FlowDirection = FlowDirection.TopDown,
@@ -112,9 +111,10 @@ namespace ProgrammingLearningApp
                 subCommandPanel.ControlRemoved += (sender, args) => AdjustRepeatBlock(block, subCommandPanel);
 
                 subCommandPanel.DragEnter += Block_DragEnter;
-                subCommandPanel.DragDrop += (s, e) => SubCommandPanel_DragDrop(s, e, commandId); // Pass parent ID
+                subCommandPanel.DragDrop += (s, e) => SubCommandPanel_DragDrop(s, e, commandId);
 
-                block.Controls.Add(subCommandPanel);              
+                // Add subcommand panel to Repeat block
+                block.Controls.Add(subCommandPanel);
             }
 
             // Event handler for TextBox to update the command value in ProgramController
@@ -124,17 +124,14 @@ namespace ProgrammingLearningApp
                 {
                     programController.UpdateCommandValue(commandId, newValue);
                 }
-                else
-                {
-                    //TODO
-                }
             };
 
             block.MouseDown += Block_MouseDown;
             block.DragEnter += Block_DragEnter;
             block.DragDrop += Block_DragDrop;
 
-            blockPanel.Controls.Add(block);
+            // Return the fully constructed block
+            return block;
         }
 
         private Color GetBlockColor(CommandType type)

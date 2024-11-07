@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Windows.Forms;
+using System.Linq;
 
 namespace ProgrammingLearningApp
 {
@@ -77,9 +76,9 @@ namespace ProgrammingLearningApp
             Button repeatButton = new Button { Text = "Repeat", BackColor = System.Drawing.Color.Orange, Width = 80 };
             Button saveButton = new Button { Text = "Save", BackColor = System.Drawing.Color.Orange, Width = 80 };
             saveButton.Click += (s, e) => SaveProgram();
-            turnButton.Click += (s, e) => blockManager.CreateBlock(CommandType.Turn);
-            moveButton.Click += (s, e) => blockManager.CreateBlock(CommandType.Move);
-            repeatButton.Click += (s, e) => blockManager.CreateBlock(CommandType.Repeat);
+            turnButton.Click += (s, e) => AddBlockToPanel(CommandType.Turn);
+            moveButton.Click += (s, e) => AddBlockToPanel(CommandType.Move);
+            repeatButton.Click += (s, e) => AddBlockToPanel(CommandType.Repeat);
 
             // Top button panel
             FlowLayoutPanel topButtonPanel = new FlowLayoutPanel
@@ -207,8 +206,8 @@ namespace ProgrammingLearningApp
         private void SaveProgram()
         {
             programController.SaveProgram();
-        }        
-       
+        }
+
         private void LoadSampleProgram(string level)
         {
             programController.LoadSampleProgram(level);
@@ -216,20 +215,45 @@ namespace ProgrammingLearningApp
 
             foreach (var command in programController.GetCommandDisplayList())
             {
-                if (command.Type == CommandType.Repeat)
-                {
-                    blockManager.CreateBlock(command.Type, command.Id, command.Value);
+                // Call a new helper method to recursively add commands and subcommands
+                AddCommandToUI(command, parentPanel: null);
+            }
+        }
 
+        // New helper method to add commands and their subcommands recursively
+        private void AddCommandToUI(Command command, FlowLayoutPanel parentPanel)
+        {
+            var block = blockManager.CreateBlock(command.Type, command.Id, command.Value);
+
+            // If the parentPanel is provided, add the block to it; otherwise, add it to the top-level blockPanel
+            if (parentPanel != null)
+            {
+                parentPanel.Controls.Add(block);
+            }
+            else
+            {
+                blockPanel.Controls.Add(block);
+            }
+
+            // Recursively add subcommands if the command is of type Repeat
+            if (command.Type == CommandType.Repeat)
+            {
+                var subCommandPanel = block.Controls.OfType<FlowLayoutPanel>().FirstOrDefault();
+                if (subCommandPanel != null)
+                {
                     foreach (var subCommand in command.SubCommands)
                     {
-                        blockManager.CreateBlock(subCommand.Type, subCommand.Id, subCommand.Value);
+                        AddCommandToUI(subCommand, subCommandPanel);
                     }
                 }
-                else
-                {
-                    blockManager.CreateBlock(command.Type, command.Id, command.Value);
-                }
             }
+        }
+
+        private void AddBlockToPanel(CommandType commandType)
+        {
+            // Create a new block and add it to the main block panel
+            var block = blockManager.CreateBlock(commandType);
+            blockPanel.Controls.Add(block);
         }
 
         private void LoadProgramFromFile()

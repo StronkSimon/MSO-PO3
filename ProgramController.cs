@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Forms;
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.IO;
+using System.Linq;
 
 namespace ProgrammingLearningApp
 {
@@ -131,10 +131,15 @@ namespace ProgrammingLearningApp
         public void AddSubCommand(int repeatCommandId, int subCommandId)
         {
             Command repeatCommand = program.Commands.Find(c => c.Id == repeatCommandId);
-            Command subCommand = program.Commands.Find(c => c.Id == subCommandId);
+            Command subCommand = program.Commands.Find(c => c.Id == subCommandId)
+                                 ?? program.Commands.SelectMany(cmd => cmd.SubCommands).FirstOrDefault(c => c.Id == subCommandId);
 
             if (repeatCommand?.Type == CommandType.Repeat && subCommand != null)
             {
+                // Remove subcommand from top-level if it exists
+                program.Commands.Remove(subCommand);
+
+                // Add the subcommand to the repeat command's subcommand list
                 repeatCommand.SubCommands.Add(subCommand);
             }
         }
