@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace ProgrammingLearningApp
@@ -7,7 +8,8 @@ namespace ProgrammingLearningApp
     {
         public int Width { get; set; } = 10;
         public int Height { get; set; } = 10;
-        private const int cellSize = 50;
+        private int cellSize = 50;
+        public List<char> exerciseCharList { get; set; } = new List<char>();
 
         public Grid(int width, int height)
         {
@@ -22,6 +24,10 @@ namespace ProgrammingLearningApp
 
         public void Draw(Graphics g, int panelWidth, int panelHeight, int characterX, int characterY)
         {
+            if (exerciseCharList.Count > 0)
+            {
+                DrawExerciseGrid(g);
+            }
             DrawGrid(g, panelWidth, panelHeight);
             DrawCharacter(g, characterX, characterY);
         }
@@ -39,6 +45,41 @@ namespace ProgrammingLearningApp
             {
                 g.DrawLine(gridPen, 0, y * cellSize, Width * cellSize, y * cellSize);
             }
+        }
+
+        public void DrawExerciseGrid(Graphics g)
+        {
+            int listCount = 0;
+            Brush pathBrush = Brushes.White;
+            Brush barrierBrush = Brushes.Orange;
+            for(int i = 0; i < this.Height; i++)
+            {
+                for(int j = 0; j < this.Width; j++)
+                {
+                    switch(exerciseCharList[listCount]) 
+                    {
+                        case '0':
+                            g.FillRectangle(pathBrush, j * cellSize, i * cellSize, cellSize,cellSize);
+                            break;
+                        case 'x':
+                            g.DrawLine(Pens.Green,j*cellSize,i*cellSize,(j+1)*cellSize,(i+1)*cellSize);
+                            g.DrawLine(Pens.Green, (j + 1) * cellSize, i * cellSize, j * cellSize, (i + 1) * cellSize);
+                            break;
+                        default:
+                            g.FillRectangle(barrierBrush, j * cellSize, i * cellSize, cellSize, cellSize);
+                            break;
+                    }
+                    listCount++;
+                }
+            }
+        }
+
+        public void InitializeExercise(List<char> exerciseCharList)
+        {
+            this.exerciseCharList = exerciseCharList;
+            this.Height = (int)Math.Sqrt((double)exerciseCharList.Count);
+            this.Width = this.Height;
+            this.cellSize = 500 / this.Height;
         }
 
         private void DrawCharacter(Graphics g, int characterX, int characterY)

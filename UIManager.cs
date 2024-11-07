@@ -221,5 +221,22 @@ namespace ProgrammingLearningApp
                 }
             }
         }
+
+        private void LoadExerciseFromFile()
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*"
+            };
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                PathFindingExercise pathFindingExercise = new PathFindingExercise();
+                string filePath = openFileDialog.FileName;
+                pathFindingExercise.loadExercise(filePath);
+                grid.InitializeExercise(pathFindingExercise.exerciseCharList);
+                gridPanel.Invalidate();
+            }
+        }
     }
 }
