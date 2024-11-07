@@ -54,7 +54,6 @@ namespace ProgrammingLearningApp
             loadProgramComboBox.Items.Add("Advanced");
             loadProgramComboBox.Items.Add("Expert");
             loadProgramComboBox.Items.Add("From file...");
-            loadProgramComboBox.Items.Add("Clear");
             loadProgramComboBox.SelectedIndexChanged += LoadProgramComboBox_SelectedIndexChanged;
             loadProgramComboBox.SelectedIndex = -1; // No item selected initially
 
@@ -153,8 +152,6 @@ namespace ProgrammingLearningApp
                         break;
                     case "From file...":
                         LoadProgramFromFile();
-                        break;
-                    case "Clear":
                         break;
                 }
             }
