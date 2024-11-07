@@ -185,9 +185,21 @@ namespace ProgrammingLearningApp
                 // Retrieve the command type from the Tag property of the dragged block
                 var blockInfo = (BlockInfo)draggedBlock.Tag;
 
-                // Add the block to the UI and to the ProgramController as a nested command
-                subCommandPanel.Controls.Add(draggedBlock);
-                programController.AddSubCommand(parentId, blockInfo.CommandId);
+                // Check if the draggedBlock is already inside the subCommandPanel to prevent duplication
+                if (subCommandPanel.Controls.Contains(draggedBlock))
+                {
+                    // If it's already in the panel, just move it to the new position within the same panel
+                    int index = subCommandPanel.Controls.GetChildIndex(draggedBlock);
+                    subCommandPanel.Controls.Remove(draggedBlock);
+                    subCommandPanel.Controls.Add(draggedBlock);
+                    subCommandPanel.Controls.SetChildIndex(draggedBlock, index);
+                }
+                else
+                {
+                    // Otherwise, add the block to the UI and to the ProgramController as a nested command
+                    subCommandPanel.Controls.Add(draggedBlock);
+                    programController.AddSubCommand(parentId, blockInfo.CommandId);
+                }
 
                 // Check if the dragged block is of type Repeat and adjust dimensions if so
                 if (blockInfo.Type == CommandType.Repeat)
