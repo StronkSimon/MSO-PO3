@@ -9,7 +9,7 @@ namespace ProgrammingLearningApp
         public int Width { get; set; } = 10;
         public int Height { get; set; } = 10;
         private int cellSize = 50;
-        public List<char> exerciseCharList { get; set; } = new List<char>();
+        public List<char> exerciseCharList { get; set; } = null;
 
         public Grid(int width, int height)
         {
@@ -24,7 +24,7 @@ namespace ProgrammingLearningApp
 
         public void Draw(Graphics g, int panelWidth, int panelHeight, int characterX, int characterY)
         {
-            if (exerciseCharList.Count > 0)
+            if (exerciseCharList != null)
             {
                 DrawExerciseGrid(g);
             }
@@ -74,7 +74,15 @@ namespace ProgrammingLearningApp
             }
         }
 
-        public void InitializeExercise(List<char> exerciseCharList)
+        public void ClearExercise() //returns values to normal
+        {
+            this.exerciseCharList = null;
+            this.Height = 10;
+            this.Width = 10;
+            this.cellSize = 50;
+        }
+
+        public void InitializeExercise(List<char> exerciseCharList) //changes the values to the size of the loaded exercise
         {
             this.exerciseCharList = exerciseCharList;
             this.Height = (int)Math.Sqrt((double)exerciseCharList.Count);
