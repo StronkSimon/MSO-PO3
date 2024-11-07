@@ -2,6 +2,8 @@
 using System.Windows.Forms;
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.IO;
 
 namespace ProgrammingLearningApp
 {
@@ -157,6 +159,69 @@ namespace ProgrammingLearningApp
             if (command != null)
             {
                 command.Value = newValue;
+            }
+        }
+
+        public async Task RunProgramWithDelay(int delayMs, Action onUpdate)
+        {
+            character.Reset(); // Reset character position and direction
+            foreach (var command in program.Commands)
+            {
+                command.Execute(character);
+                onUpdate(); // Trigger UI update after each command
+                await Task.Delay(delayMs); // Delay between commands
+            }
+        }
+
+        public void LoadProgramFromFile(string filePath)
+        {
+            program.Commands.Clear(); // Clear existing commands before loading new ones
+
+            using (StreamReader reader = new StreamReader(filePath))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    var parts = line.Split(' ');
+                    if (parts.Length > 0)
+                    {
+                        CommandType commandType;
+                        int value = 1; // Default value for Turn commands
+
+                        switch (parts[0].ToLower())
+                        {
+                            case "move":
+                                commandType = CommandType.Move;
+                                if (parts.Length > 1 && int.TryParse(parts[1], out int moveValue))
+                                {
+                                    value = moveValue;
+                                }
+                                break;
+
+                            case "turn":
+                                commandType = CommandType.Turn;
+                                if (parts.Length > 1)
+                                {
+                                    value = parts[1].ToLower() == "right" ? 1 : -1;
+                                }
+                                break;
+
+                            case "repeat":
+                                commandType = CommandType.Repeat;
+                                if (parts.Length > 1 && int.TryParse(parts[1], out int repeatValue))
+                                {
+                                    value = repeatValue;
+                                }
+                                break;
+
+                            default:
+                                continue; // Ignore unrecognized commands
+                        }
+
+                        // Add the parsed command to the program
+                        AddCommand(commandType, value);
+                    }
+                }
             }
         }
     }

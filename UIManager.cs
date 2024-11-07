@@ -186,10 +186,11 @@ namespace ProgrammingLearningApp
             grid.Draw(e.Graphics, gridPanel.Width, gridPanel.Height, characterX, characterY);
         }
 
-        private void RunButton_Click(object sender, EventArgs e)
+        private async void RunButton_Click(object sender, EventArgs e)
         {
+            int delay = 300;
             string result = programController.RunProgram();
-            gridPanel.Invalidate();
+            await programController.RunProgramWithDelay(delay, () => gridPanel.Invalidate());
             MessageBox.Show(result, "Execution Result");
         }
 
@@ -241,7 +242,7 @@ namespace ProgrammingLearningApp
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 string filePath = openFileDialog.FileName;
-                // programController.LoadProgramFromFile(filePath);
+                programController.LoadProgramFromFile(filePath);
 
                 blockPanel.Controls.Clear();
 
