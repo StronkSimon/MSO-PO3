@@ -274,7 +274,7 @@ namespace ProgrammingLearningApp
                 // Update the block panel to display the loaded program commands
                 foreach (var command in programController.GetCommandDisplayList())
                 {
-                    blockManager.CreateBlock(command.Type, command.Id, command.Value);
+                    AddCommandToUI(command, parentPanel: null);
                 }
             }
         }

@@ -186,47 +186,73 @@ namespace ProgrammingLearningApp
 
             using (StreamReader reader = new StreamReader(filePath))
             {
+                Command currentRepeatCommand = null;
+                int currentIndentationLevel = 0;
+
                 string line;
                 while ((line = reader.ReadLine()) != null)
                 {
-                    var parts = line.Split(' ');
-                    if (parts.Length > 0)
+                    // Determine indentation level
+                    int indentationLevel = line.TakeWhile(char.IsWhiteSpace).Count() / 4; // Assume 4 spaces per indent
+                    string trimmedLine = line.Trim();
+
+                    // Skip empty lines
+                    if (string.IsNullOrWhiteSpace(trimmedLine)) continue;
+
+                    // Parse the command type and value
+                    var parts = trimmedLine.Split(' ');
+                    CommandType commandType;
+                    int value = 1; // Default value for commands like Turn
+
+                    switch (parts[0].ToLower())
                     {
-                        CommandType commandType;
-                        int value = 1; // Default value for Turn commands
+                        case "move":
+                            commandType = CommandType.Move;
+                            if (parts.Length > 1 && int.TryParse(parts[1], out int moveValue))
+                            {
+                                value = moveValue;
+                            }
+                            break;
 
-                        switch (parts[0].ToLower())
+                        case "turn":
+                            commandType = CommandType.Turn;
+                            value = parts[1].ToLower() == "right" ? 1 : -1;
+                            break;
+
+                        case "repeat":
+                            commandType = CommandType.Repeat;
+                            if (parts.Length > 1 && int.TryParse(parts[1], out int repeatValue))
+                            {
+                                value = repeatValue;
+                            }
+                            break;
+
+                        default:
+                            continue; // Ignore unrecognized commands
+                    }
+
+                    // Add the command to the program
+                    Command newCommand = new Command(commandType, value, character);
+
+                    if (commandType == CommandType.Repeat)
+                    {
+                        currentRepeatCommand = newCommand;
+                        currentIndentationLevel = indentationLevel;
+                        program.Commands.Add(newCommand);
+                    }
+                    else
+                    {
+                        // Check if the command is a subcommand
+                        if (currentRepeatCommand != null && indentationLevel > currentIndentationLevel)
                         {
-                            case "move":
-                                commandType = CommandType.Move;
-                                if (parts.Length > 1 && int.TryParse(parts[1], out int moveValue))
-                                {
-                                    value = moveValue;
-                                }
-                                break;
-
-                            case "turn":
-                                commandType = CommandType.Turn;
-                                if (parts.Length > 1)
-                                {
-                                    value = parts[1].ToLower() == "right" ? 1 : -1;
-                                }
-                                break;
-
-                            case "repeat":
-                                commandType = CommandType.Repeat;
-                                if (parts.Length > 1 && int.TryParse(parts[1], out int repeatValue))
-                                {
-                                    value = repeatValue;
-                                }
-                                break;
-
-                            default:
-                                continue; // Ignore unrecognized commands
+                            currentRepeatCommand.SubCommands.Add(newCommand);
                         }
-
-                        // Add the parsed command to the program
-                        AddCommand(commandType, value);
+                        else
+                        {
+                            // If not a subcommand, add it to the top-level commands
+                            program.Commands.Add(newCommand);
+                            currentRepeatCommand = null; // Reset repeat context
+                        }
                     }
                 }
             }
