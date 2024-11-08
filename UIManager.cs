@@ -16,9 +16,11 @@ namespace ProgrammingLearningApp
         public UIManager()
         {
             InitializeComponent();
-            programController = new ProgramController();
-            blockManager = new BlockManager(blockPanel, programController);
             grid = new Grid(10, 10);
+            programController = new ProgramController();
+            programController.grid = this.grid;
+            programController.MakeCharacter(this.grid);
+            blockManager = new BlockManager(blockPanel, programController);
         }
 
         private void InitializeComponent()
@@ -176,8 +178,8 @@ namespace ProgrammingLearningApp
         private void GridPanel_Paint(object sender, PaintEventArgs e)
         {
             // Get the latest character position
-            int characterX = programController.Character.X;
-            int characterY = programController.Character.Y;
+            int characterX = programController.character.X;
+            int characterY = programController.character.Y;
 
             // Draw the grid and character position using the Grid class
             grid.Draw(e.Graphics, gridPanel.Width, gridPanel.Height, characterX, characterY);

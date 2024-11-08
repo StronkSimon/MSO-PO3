@@ -11,18 +11,19 @@ namespace ProgrammingLearningApp
     {
         private ExportManager exportManager;
         private readonly Program program;
-        private readonly Character character;
-        private readonly Grid grid;
+        public Character character;
+        public Grid grid;
 
         public ProgramController()
         {
-            grid = new Grid(10, 10); // Initialize a 10x10 grid
-            character = new Character(grid); // Pass the grid to the character
             program = new Program("Sample Program");
             exportManager = new ExportManager();
         }
 
-        public Character Character => character; // Expose character to UIManager
+        public void MakeCharacter(Grid grid)
+        {
+            character = new Character(grid);
+        }
 
         // Loads a hardcoded sample program based on difficulty level
         public void LoadSampleProgram(string level)
@@ -66,6 +67,7 @@ namespace ProgrammingLearningApp
         // Executes the program and returns the final state of the character
         public string RunProgram()
         {
+            character.grid = this.grid;
             character.Reset(); // Reset character position and direction without reassigning
             program.Execute(character);
             return $"Final Position: ({character.X}, {character.Y}), Facing: {character.Direction}";
