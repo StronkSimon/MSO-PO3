@@ -161,12 +161,35 @@ namespace ProgrammingLearningApp
 
         public void UpdateCommandValue(int commandId, int newValue)
         {
-            // Find the command with the specified ID and update its value
-            var command = program.Commands.Find(c => c.Id == commandId);
+            // Find the command in the top-level or nested subcommands
+            Command command = FindCommandById(commandId, program.Commands);
+
             if (command != null)
             {
                 command.Value = newValue;
             }
+        }
+
+        // Recursive helper method to find a command by ID
+        private Command FindCommandById(int commandId, List<Command> commands)
+        {
+            foreach (var command in commands)
+            {
+                if (command.Id == commandId)
+                {
+                    return command;
+                }
+
+                if (command.Type == CommandType.Repeat)
+                {
+                    Command subCommand = FindCommandById(commandId, command.SubCommands);
+                    if (subCommand != null)
+                    {
+                        return subCommand;
+                    }
+                }
+            }
+            return null;
         }
 
         public async Task RunProgramWithDelay(int delayMs, Action onUpdate)
