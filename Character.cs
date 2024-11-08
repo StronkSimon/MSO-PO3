@@ -7,7 +7,7 @@ namespace ProgrammingLearningApp
         public int X { get; private set; } = 0;
         public int Y { get; private set; } = 0;
         public Direction Direction { get; private set; } = Direction.East;
-        private readonly Grid grid;
+        public Grid grid;
 
         public Character(Grid grid)
         {
