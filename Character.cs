@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace ProgrammingLearningApp
 {
@@ -43,13 +44,22 @@ namespace ProgrammingLearningApp
             // Check if the new position is within the grid boundaries
             if (grid.IsWithinBounds(newX, newY))
             {
-                X = newX;
-                Y = newY;
-                Trail.Add(new Point(X, Y));
+                // Record all intermediate steps
+                while (X != newX || Y != newY)
+                {
+                    if (X < newX) X++;
+                    else if (X > newX) X--;
+
+                    if (Y < newY) Y++;
+                    else if (Y > newY) Y--;
+
+                    // Add the intermediate position to the trail
+                    Trail.Add(new Point(X, Y));
+                }
             }
             else
             {
-                Console.WriteLine("Move blocked: Character is at the grid boundary.");
+                MessageBox.Show("Move blocked: Character is at the grid boundary.");
             }
         }
 
