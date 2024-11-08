@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Security.AccessControl;
 
 namespace ProgrammingLearningApp
 {
@@ -19,7 +20,26 @@ namespace ProgrammingLearningApp
 
         public bool IsWithinBounds(int x, int y)
         {
-            return x >= 0 && x < Width && y >= 0 && y < Height;
+            return x >= 0 && x < Width && y >= 0 && y < Height && IsWithinExerciseBounds(x,y);
+        }
+
+        private bool IsWithinExerciseBounds(int x, int y)
+        {
+            if(exerciseCharList == null)
+            {
+                return true;
+            }
+            else
+            {
+                if (exerciseCharList[y * Height + x] == '+')
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
         }
 
         public void Draw(Graphics g, int panelWidth, int panelHeight, int characterX, int characterY, List<Point> trail)
