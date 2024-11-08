@@ -22,13 +22,14 @@ namespace ProgrammingLearningApp
             return x >= 0 && x < Width && y >= 0 && y < Height;
         }
 
-        public void Draw(Graphics g, int panelWidth, int panelHeight, int characterX, int characterY)
+        public void Draw(Graphics g, int panelWidth, int panelHeight, int characterX, int characterY, List<Point> trail)
         {
             if (exerciseCharList != null)
             {
                 DrawExerciseGrid(g);
             }
             DrawGrid(g, panelWidth, panelHeight);
+            DrawTrail(g, trail);
             DrawCharacter(g, characterX, characterY);
         }
 
@@ -100,6 +101,19 @@ namespace ProgrammingLearningApp
                 // Draw a green cross at the character's position
                 g.DrawLine(Pens.Green, centerX - 5, centerY, centerX + 5, centerY);
                 g.DrawLine(Pens.Green, centerX, centerY - 5, centerX, centerY + 5);
+            }
+        }
+
+        private void DrawTrail(Graphics g, List<Point> trail)
+        {
+            Brush trailBrush = Brushes.LightBlue;
+
+            foreach (var point in trail)
+            {
+                if (IsWithinBounds(point.X, point.Y))
+                {
+                    g.FillRectangle(trailBrush, point.X * cellSize, point.Y * cellSize, cellSize, cellSize);
+                }
             }
         }
     }

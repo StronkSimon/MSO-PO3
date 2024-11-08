@@ -180,9 +180,10 @@ namespace ProgrammingLearningApp
             // Get the latest character position
             int characterX = programController.character.X;
             int characterY = programController.character.Y;
+            var trail = programController.character.Trail;
 
             // Draw the grid and character position using the Grid class
-            grid.Draw(e.Graphics, gridPanel.Width, gridPanel.Height, characterX, characterY);
+            grid.Draw(e.Graphics, gridPanel.Width, gridPanel.Height, characterX, characterY, trail);
         }
 
         private async void RunButton_Click(object sender, EventArgs e)

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace ProgrammingLearningApp
 {
@@ -9,9 +11,12 @@ namespace ProgrammingLearningApp
         public Direction Direction { get; private set; } = Direction.East;
         public Grid grid;
 
+        public List<Point> Trail { get; private set; } = new List<Point>();
+
         public Character(Grid grid)
         {
             this.grid = grid;
+            Trail.Add(new Point(X, Y));
         }
 
         public void Move(int steps)
@@ -40,6 +45,7 @@ namespace ProgrammingLearningApp
             {
                 X = newX;
                 Y = newY;
+                Trail.Add(new Point(X, Y));
             }
             else
             {
@@ -62,6 +68,8 @@ namespace ProgrammingLearningApp
             X = 0;
             Y = 0;
             Direction = Direction.East;
+            Trail.Clear();
+            Trail.Add(new Point(X, Y));
         }
     }
 
